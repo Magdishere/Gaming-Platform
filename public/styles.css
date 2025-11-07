@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #0b0b0b; /* pure dark background */
+  background-color: #0b0b0b; /* dark background */
   color: #d4d4d4;            /* soft gray text */
   line-height: 1.5;
 }
@@ -21,6 +21,7 @@ a {
 
 button {
   cursor: pointer;
+  transition: all 0.3s;
 }
 
 /* ===========================
@@ -38,16 +39,16 @@ button {
 
 h1 {
   text-align: center;
-  color: #bfbfbf;           /* light gray */
+  color: #bfbfbf;
   margin-bottom: 20px;
-  text-shadow: 0 0 10px rgba(191, 191, 191, 0.4);
+  text-shadow: 0 0 10px rgba(191, 191, 191, 0.3);
   letter-spacing: 1px;
 }
 
 h2 {
   color: #bfbfbf;
   margin-bottom: 15px;
-  text-shadow: 0 0 6px rgba(191, 191, 191, 0.3);
+  text-shadow: 0 0 6px rgba(191, 191, 191, 0.2);
   font-size: 1.2em;
 }
 
@@ -68,7 +69,6 @@ h2 {
   padding: 10px 22px;
   border-radius: 6px;
   font-weight: 600;
-  transition: all 0.3s;
 }
 
 .toggle-buttons button:hover {
@@ -100,7 +100,6 @@ input {
   min-width: 150px;
   background: #1a1a1a;
   color: #d4d4d4;
-  transition: border 0.3s, box-shadow 0.3s;
 }
 
 input:focus {
@@ -116,7 +115,6 @@ button {
   border-radius: 6px;
   padding: 10px 20px;
   font-weight: 600;
-  transition: all 0.3s;
 }
 
 button:hover {
@@ -160,6 +158,7 @@ tr:hover {
 =========================== */
 .actions {
   display: flex;
+  flex-wrap: wrap;          /* allow buttons to wrap in small widths */
   align-items: center;
   gap: 5px;
 }
@@ -169,10 +168,12 @@ tr:hover {
   font-size: 0.9em;
   border-radius: 4px;
   font-weight: 600;
+  flex: 1 1 auto;           /* allow shrinking/growing */
+  min-width: 60px;
 }
 
 .actions .edit {
-  background: #888888; /* medium gray */
+  background: #888888;
   color: #0b0b0b;
 }
 
@@ -182,13 +183,33 @@ tr:hover {
 }
 
 .actions .delete {
-  background: #c0392b; /* dark red for delete */
+  background: #c0392b;
   color: #fff;
 }
 
 .actions .delete:hover {
   background: #e74c3c;
   box-shadow: 0 0 6px rgba(231, 76, 60, 0.5);
+}
+
+.actions .join {
+  background: #2980b9;
+  color: #fff;
+}
+
+.actions .join:hover {
+  background: #3498db;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.5);
+}
+
+.actions .leave {
+  background: #f39c12;
+  color: #0b0b0b;
+}
+
+.actions .leave:hover {
+  background: #f1c40f;
+  box-shadow: 0 0 6px rgba(241, 196, 15, 0.5);
 }
 
 /* ===========================
@@ -205,4 +226,30 @@ tr:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 600px) {
+  .toggle-buttons {
+    flex-direction: column;
+  }
+
+  form {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  th, td {
+    padding: 8px;
+  }
 }
