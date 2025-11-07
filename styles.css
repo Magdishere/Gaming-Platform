@@ -64,35 +64,25 @@ tr:hover { background: #262626; }
    RESPONSIVE TABLES (card-style)
 =========================== */
 @media (max-width: 600px) {
-  table, thead, tbody, th, td, tr { display: block; width: 100%; }
-  thead tr { display: none; }
-
-  tr {
-    margin-bottom: 1rem;
-    background: #1f1f1f;
-    border-radius: 8px;
-    padding: 10px;
-  }
-
   td {
-    display: flex;
-    justify-content: space-between;
+    display: block;       /* stack vertically */
     padding: 8px 0;
     border: none;
     border-bottom: 1px solid #333;
-    flex-wrap: wrap;
   }
 
   td::before {
+    display: block;       /* label on top */
     content: attr(data-label);
     font-weight: 600;
     color: #bfbfbf;
-    flex: 0 0 50%;
+    margin-bottom: 4px;   /* space between label and value */
   }
 
   .actions {
-    justify-content: flex-start;
+    display: flex;
     gap: 5px;
     flex-wrap: wrap;
   }
 }
+
