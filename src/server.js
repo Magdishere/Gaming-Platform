@@ -5,27 +5,29 @@ import { connectDB, getDB } from "./db.js";
 import { ObjectId } from "mongodb";
 import path from "path";
 import { fileURLToPath } from "url";
-dotenv.config();
 
+dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Setup __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, "../public")));
 
+// Serve static files from project root
+app.use(express.static(__dirname));
+
+// Connect to MongoDB
 await connectDB();
 const db = getDB();
 const gamesCol = db.collection(process.env.GAMES_COLLECTION_NAME);
 const playersCol = db.collection(process.env.PLAYERS_COLLECTION_NAME);
 
-// health check
-app.get("/api/health", async (req, res) => {
-  res.json({ ok: true });
-});
+// === HEALTH CHECK ===
+app.get("/api/health", (req, res) => res.json({ ok: true }));
 
-// === Games CRUD ===
+// === GAMES CRUD ===
 app.get("/api/games", async (req, res) => {
   const list = await gamesCol.find({}).sort({ title: 1 }).toArray();
   res.json(list);
@@ -59,7 +61,6 @@ app.put("/api/games/:id", async (req, res) => {
   res.json(result);
 });
 
-
 app.delete("/api/games/:id", async (req, res) => {
   const id = req.params.id;
   const result = await gamesCol.deleteOne({ _id: new ObjectId(id) });
@@ -68,7 +69,7 @@ app.delete("/api/games/:id", async (req, res) => {
   res.json({ ok: true });
 });
 
-// === players CRUD ===
+// === PLAYERS CRUD ===
 app.get("/api/players", async (req, res) => {
   const { name } = req.query;
   const filter = name ? { name: { $regex: name, $options: "i" } } : {};
@@ -108,7 +109,7 @@ app.delete("/api/players/:id", async (req, res) => {
   res.json({ ok: true });
 });
 
-// === Join / Leave ===
+// === JOIN / LEAVE ===
 app.post("/api/players/:id/join", async (req, res) => {
   const playerId = req.params.id;
   const { gameId } = req.body;
@@ -145,6 +146,7 @@ app.post("/api/players/:id/leave", async (req, res) => {
   if (!gameId) return res.status(400).json({ error: "gameId is required" });
   const player = await playersCol.findOne({ _id: new ObjectId(playerId) });
   if (!player) return res.status(404).json({ error: "player not found" });
+
   const updated = await playersCol.findOneAndUpdate(
     { _id: new ObjectId(playerId) },
     { $pull: { joinedGames: { gameId } } },
@@ -154,7 +156,7 @@ app.post("/api/players/:id/leave", async (req, res) => {
 });
 
 // === DEMO SEED ===
-app.post("/api/seed", async (req, res) => {git 
+app.post("/api/seed", async (req, res) => {
   const games = [
     { title: "Battle Quest", code: "BQ101" },
     { title: "Space Raiders", code: "SR202" },
@@ -177,12 +179,10 @@ app.post("/api/seed", async (req, res) => {git
 });
 
 // === SPA FALLBACK ===
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// === Start Server ===
+// === START SERVER ===
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`🎮 Gaming API running at http://localhost:${port}`);
-});
+app.listen(port, () => console.log(`🎮 Gaming API running at http://localhost:${port}`));
