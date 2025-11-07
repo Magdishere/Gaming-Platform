@@ -5,89 +5,70 @@ import { connectDB, getDB } from "./db.js";
 import { ObjectId } from "mongodb";
 import path from "path";
 import { fileURLToPath } from "url";
-
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === Static setup for SPA ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../public")));
 
-// === Connect Database ===
 await connectDB();
 const db = getDB();
-const gamesCol = db.collection("games");
-const playersCol = db.collection("players");
+const gamesCol = db.collection(process.env.GAMES_COLLECTION_NAME);
+const playersCol = db.collection(process.env.PLAYERS_COLLECTION_NAME);
 
-// === Health Check ===
-app.get("/api/health", (req, res) => {
+// health check
+app.get("/api/health", async (req, res) => {
   res.json({ ok: true });
 });
 
-// === GAMES CRUD ===
-
-// Get all games
+// === Games CRUD ===
 app.get("/api/games", async (req, res) => {
   const list = await gamesCol.find({}).sort({ title: 1 }).toArray();
   res.json(list);
 });
 
-// Get game by ID
 app.get("/api/games/:id", async (req, res) => {
   const doc = await gamesCol.findOne({ _id: new ObjectId(req.params.id) });
   if (!doc) return res.status(404).json({ error: "Not found" });
   res.json(doc);
 });
 
-// Create new game
 app.post("/api/games", async (req, res) => {
   const { title, code } = req.body;
-  if (!title || !code)
-    return res.status(400).json({ error: "title and code are required" });
-
+  if (!title || !code) return res.status(400).json({ error: "title and code are required" });
   const exists = await gamesCol.findOne({ code });
   if (exists) return res.status(409).json({ error: "Game code already exists" });
-
   const result = await gamesCol.insertOne({ title, code });
   const saved = await gamesCol.findOne({ _id: result.insertedId });
   res.status(201).json(saved);
 });
 
-// Update game
 app.put("/api/games/:id", async (req, res) => {
   const { title, code } = req.body;
-  if (!title || !code)
-    return res.status(400).json({ error: "title and code are required" });
-
+  if (!title || !code) return res.status(400).json({ error: "title and code are required" });
   const result = await gamesCol.findOneAndUpdate(
     { _id: new ObjectId(req.params.id) },
     { $set: { title, code } },
     { returnDocument: "after" }
   );
-
-  if (!result.value) return res.status(404).json({ error: "Not found" });
-  res.json(result.value);
+  if (!result) return res.status(404).json({ error: "Not found" });
+  res.json(result);
 });
 
-// Delete game
+
 app.delete("/api/games/:id", async (req, res) => {
   const id = req.params.id;
   const result = await gamesCol.deleteOne({ _id: new ObjectId(id) });
-  if (result.deletedCount === 0)
-    return res.status(404).json({ error: "Not found" });
-
-  // Remove from all players' joinedGames
+  if (result.deletedCount === 0) return res.status(404).json({ error: "Not found" });
   await playersCol.updateMany({}, { $pull: { joinedGames: { gameId: id } } });
   res.json({ ok: true });
 });
 
-// === PLAYERS CRUD ===
-
-// Get all players (with optional name filter)
+// === players CRUD ===
 app.get("/api/players", async (req, res) => {
   const { name } = req.query;
   const filter = name ? { name: { $regex: name, $options: "i" } } : {};
@@ -95,98 +76,81 @@ app.get("/api/players", async (req, res) => {
   res.json(list);
 });
 
-// Get player by ID
 app.get("/api/players/:id", async (req, res) => {
   const doc = await playersCol.findOne({ _id: new ObjectId(req.params.id) });
   if (!doc) return res.status(404).json({ error: "Not found" });
   res.json(doc);
 });
 
-// Create player
 app.post("/api/players", async (req, res) => {
   const { name, email } = req.body;
   if (!name) return res.status(400).json({ error: "name is required" });
-
-  const result = await playersCol.insertOne({
-    name,
-    email: email || null,
-    joinedGames: [],
-  });
+  const result = await playersCol.insertOne({ name, email: email || null, joinedGames: [] });
   const saved = await playersCol.findOne({ _id: result.insertedId });
   res.status(201).json(saved);
 });
 
-// Update player
 app.put("/api/players/:id", async (req, res) => {
   const { name, email } = req.body;
   if (!name) return res.status(400).json({ error: "name is required" });
-
   const result = await playersCol.findOneAndUpdate(
     { _id: new ObjectId(req.params.id) },
     { $set: { name, email: email || null } },
     { returnDocument: "after" }
   );
-
-  if (!result.value) return res.status(404).json({ error: "Not found" });
-  res.json(result.value);
+  if (!result) return res.status(404).json({ error: "Not found" });
+  res.json(result);
 });
 
-// Delete player
 app.delete("/api/players/:id", async (req, res) => {
   const result = await playersCol.deleteOne({ _id: new ObjectId(req.params.id) });
-  if (result.deletedCount === 0)
-    return res.status(404).json({ error: "Not found" });
+  if (result.deletedCount === 0) return res.status(404).json({ error: "Not found" });
   res.json({ ok: true });
 });
 
-// === JOIN GAME ===
+// === Join / Leave ===
 app.post("/api/players/:id/join", async (req, res) => {
   const playerId = req.params.id;
-  const { gameCode } = req.body;
-  if (!gameCode) return res.status(400).json({ error: "gameCode is required" });
-
+  const { gameId } = req.body;
+  if (!gameId) return res.status(400).json({ error: "gameId is required" });
   const player = await playersCol.findOne({ _id: new ObjectId(playerId) });
-  const game = await gamesCol.findOne({ code: gameCode });
-  if (!player) return res.status(404).json({ error: "Player not found" });
-  if (!game) return res.status(404).json({ error: "Game not found" });
+  const game = await gamesCol.findOne({ _id: new ObjectId(gameId) });
+  if (!player) return res.status(404).json({ error: "player not found" });
+  if (!game) return res.status(404).json({ error: "game not found" });
 
   const already = await playersCol.findOne({
     _id: new ObjectId(playerId),
-    "joinedGames.gameId": game._id.toString(),
+    "joinedGames.gameId": gameId
   });
-  if (already) return res.status(409).json({ error: "Already joined" });
+  if (already) return res.status(409).json({ error: "Already Joined" });
 
   const embedded = {
     gameId: game._id.toString(),
     title: game.title,
     code: game.code,
-    joinedAt: new Date().toISOString(),
+    registeredAt: new Date().toISOString()
   };
 
-  const result = await playersCol.findOneAndUpdate(
+  const updated = await playersCol.findOneAndUpdate(
     { _id: new ObjectId(playerId) },
     { $push: { joinedGames: embedded } },
     { returnDocument: "after" }
   );
-
-  res.json(result.value);
+  res.json(updated);
 });
 
-// === LEAVE GAME ===
 app.post("/api/players/:id/leave", async (req, res) => {
-  console.log("LEAVE BODY:", req.body);
   const playerId = req.params.id;
-  const { gameCode } = req.body.gameCode || req.body.code;
-  if (!gameCode) return res.status(400).json({ error: "gameCode is required" });
-
-  const result = await playersCol.findOneAndUpdate(
+  const { gameId } = req.body;
+  if (!gameId) return res.status(400).json({ error: "gameId is required" });
+  const player = await playersCol.findOne({ _id: new ObjectId(playerId) });
+  if (!player) return res.status(404).json({ error: "player not found" });
+  const updated = await playersCol.findOneAndUpdate(
     { _id: new ObjectId(playerId) },
-    { $pull: { joinedGames: { code: gameCode } } },
+    { $pull: { joinedGames: { gameId } } },
     { returnDocument: "after" }
   );
-
-  if (!result.value) return res.status(404).json({ error: "Player not found" });
-  res.json(result.value);
+  res.json(updated);
 });
 
 // === DEMO SEED ===

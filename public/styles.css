@@ -1,31 +1,59 @@
-/* ---------- Base ---------- */
-body {
-  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: #0b0d12;
+/* ===========================
+   BASE & GLOBAL
+=========================== */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  color: #e0e6ed;
 }
 
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0a0a12; /* darker background */
+  color: #e0d7f8;           /* light purple text */
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ===========================
+   CONTAINER & HEADINGS
+=========================== */
 .container {
   max-width: 900px;
   margin: 40px auto;
-  background: #151920;
+  background: #14121f;
   border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
   padding: 30px;
-  border: 1px solid #222831;
+  border: 1px solid #2b2640;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
   text-align: center;
-  color: #00ffff;
+  color: #d94fff;             /* neon purple */
   margin-bottom: 20px;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  text-shadow: 0 0 10px rgba(217, 79, 255, 0.6);
   letter-spacing: 1px;
 }
 
-/* ---------- Toggle Buttons ---------- */
+h2 {
+  color: #d94fff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 6px rgba(217, 79, 255, 0.4);
+  font-size: 1.2em;
+}
+
+/* ===========================
+   TOGGLE BUTTONS
+=========================== */
 .toggle-buttons {
   display: flex;
   justify-content: center;
@@ -34,27 +62,28 @@ h1 {
 }
 
 .toggle-buttons button {
-  background: #1e232d;
-  border: 1px solid #2b313c;
-  color: #d8dee9;
+  background: #1a1730;
+  border: 1px solid #2e2650;
+  color: #e0d7f8;
   padding: 10px 22px;
   border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s;
   font-weight: 600;
+  transition: all 0.3s;
 }
 
 .toggle-buttons button:hover {
-  background: #262b36;
+  background: #2e2650;
 }
 
 .toggle-buttons button.active {
-  background: #00ffff;
-  color: #0b0d12;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  background: #d94fff;
+  color: #0a0a12;
+  box-shadow: 0 0 10px rgba(217, 79, 255, 0.6);
 }
 
-/* ---------- Forms ---------- */
+/* ===========================
+   FORMS
+=========================== */
 form {
   display: flex;
   flex-wrap: wrap;
@@ -65,38 +94,39 @@ form {
 
 input {
   padding: 10px;
-  border: 1px solid #333a45;
+  border: 1px solid #352d4a;
   border-radius: 6px;
   flex: 1;
   min-width: 150px;
-  background: #0f1217;
-  color: #e0e6ed;
-  transition: border 0.3s;
+  background: #1c1830;
+  color: #e0d7f8;
+  transition: border 0.3s, box-shadow 0.3s;
 }
 
 input:focus {
   outline: none;
-  border-color: #00ffff;
-  box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+  border-color: #d94fff;
+  box-shadow: 0 0 6px rgba(217, 79, 255, 0.4);
 }
 
 button {
-  background: #00ffff;
-  color: #0b0d12;
+  background: #d94fff;
+  color: #0a0a12;
   border: none;
   border-radius: 6px;
   padding: 10px 20px;
-  cursor: pointer;
-  transition: all 0.3s;
   font-weight: 600;
+  transition: all 0.3s;
 }
 
 button:hover {
-  background: #00dada;
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+  background: #ff6ff0;
+  box-shadow: 0 0 8px rgba(217, 79, 255, 0.5);
 }
 
-/* ---------- Tables ---------- */
+/* ===========================
+   TABLES
+=========================== */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -106,41 +136,49 @@ table {
 th, td {
   text-align: left;
   padding: 10px;
-  border-bottom: 1px solid #2b313c;
+  border-bottom: 1px solid #2e2650;
 }
 
 th {
-  background: #1e232d;
-  color: #00ffff;
+  background: #1a1730;
+  color: #d94fff;
   text-transform: uppercase;
   font-size: 0.9em;
   letter-spacing: 0.5px;
 }
 
 td {
-  color: #d8dee9;
+  color: #e0d7f8;
 }
 
 tr:hover {
-  background: #1a1f27;
+  background: #201b36;
 }
 
-/* ---------- Action Buttons ---------- */
+/* ===========================
+   ACTION BUTTONS
+=========================== */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .actions button {
-  margin-right: 5px;
   padding: 6px 10px;
   font-size: 0.9em;
   border-radius: 4px;
+  font-weight: 600;
 }
 
 .actions .edit {
-  background: #ffb400;
-  color: #0b0d12;
+  background: #ff8c00; /* orange edit */
+  color: #0a0a12;
 }
 
 .actions .edit:hover {
-  background: #ffc93c;
-  box-shadow: 0 0 6px rgba(255, 180, 0, 0.6);
+  background: #ffb84d;
+  box-shadow: 0 0 6px rgba(255, 140, 0, 0.6);
 }
 
 .actions .delete {
@@ -153,7 +191,41 @@ tr:hover {
   box-shadow: 0 0 6px rgba(231, 76, 60, 0.6);
 }
 
-/* ---------- Visibility ---------- */
+/* ===========================
+   JOIN / LEAVE DROPDOWNS
+=========================== */
+.actions select.join-game,
+.actions select.leave-game {
+  background: #1a1730;
+  border: 1px solid #2e2650;
+  color: #d94fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.actions select.join-game:hover,
+.actions select.leave-game:hover {
+  background: #d94fff;
+  color: #0a0a12;
+  box-shadow: 0 0 6px rgba(217, 79, 255, 0.6);
+}
+
+.actions select:focus {
+  outline: none;
+  border-color: #d94fff;
+  box-shadow: 0 0 8px rgba(217, 79, 255, 0.8);
+}
+
+.actions select option {
+  color: #0a0a12;
+}
+
+/* ===========================
+   VISIBILITY & ANIMATION
+=========================== */
 .hidden {
   display: none;
 }
@@ -165,4 +237,22 @@ tr:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 600px) {
+  .toggle-buttons {
+    flex-direction: column;
+  }
+
+  form {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 3px;
+  }
 }
