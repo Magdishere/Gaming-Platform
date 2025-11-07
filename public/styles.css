@@ -9,8 +9,8 @@
 
 body {
   font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #0a0a12; /* darker background */
-  color: #e0d7f8;           /* light purple text */
+  background-color: #0b0b0b; /* pure dark background */
+  color: #d4d4d4;            /* soft gray text */
   line-height: 1.5;
 }
 
@@ -29,25 +29,25 @@ button {
 .container {
   max-width: 900px;
   margin: 40px auto;
-  background: #14121f;
+  background: #141414;
   border-radius: 12px;
   padding: 30px;
-  border: 1px solid #2b2640;
+  border: 1px solid #2a2a2a;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
   text-align: center;
-  color: #d94fff;             /* neon purple */
+  color: #bfbfbf;           /* light gray */
   margin-bottom: 20px;
-  text-shadow: 0 0 10px rgba(217, 79, 255, 0.6);
+  text-shadow: 0 0 10px rgba(191, 191, 191, 0.4);
   letter-spacing: 1px;
 }
 
 h2 {
-  color: #d94fff;
+  color: #bfbfbf;
   margin-bottom: 15px;
-  text-shadow: 0 0 6px rgba(217, 79, 255, 0.4);
+  text-shadow: 0 0 6px rgba(191, 191, 191, 0.3);
   font-size: 1.2em;
 }
 
@@ -62,9 +62,9 @@ h2 {
 }
 
 .toggle-buttons button {
-  background: #1a1730;
-  border: 1px solid #2e2650;
-  color: #e0d7f8;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  color: #d4d4d4;
   padding: 10px 22px;
   border-radius: 6px;
   font-weight: 600;
@@ -72,13 +72,13 @@ h2 {
 }
 
 .toggle-buttons button:hover {
-  background: #2e2650;
+  background: #333;
 }
 
 .toggle-buttons button.active {
-  background: #d94fff;
-  color: #0a0a12;
-  box-shadow: 0 0 10px rgba(217, 79, 255, 0.6);
+  background: #d4d4d4;
+  color: #0b0b0b;
+  box-shadow: 0 0 10px rgba(212, 212, 212, 0.5);
 }
 
 /* ===========================
@@ -94,24 +94,24 @@ form {
 
 input {
   padding: 10px;
-  border: 1px solid #352d4a;
+  border: 1px solid #333;
   border-radius: 6px;
   flex: 1;
   min-width: 150px;
-  background: #1c1830;
-  color: #e0d7f8;
+  background: #1a1a1a;
+  color: #d4d4d4;
   transition: border 0.3s, box-shadow 0.3s;
 }
 
 input:focus {
   outline: none;
-  border-color: #d94fff;
-  box-shadow: 0 0 6px rgba(217, 79, 255, 0.4);
+  border-color: #bfbfbf;
+  box-shadow: 0 0 6px rgba(191, 191, 191, 0.4);
 }
 
 button {
-  background: #d94fff;
-  color: #0a0a12;
+  background: #bfbfbf;
+  color: #0b0b0b;
   border: none;
   border-radius: 6px;
   padding: 10px 20px;
@@ -120,8 +120,8 @@ button {
 }
 
 button:hover {
-  background: #ff6ff0;
-  box-shadow: 0 0 8px rgba(217, 79, 255, 0.5);
+  background: #d4d4d4;
+  box-shadow: 0 0 8px rgba(212, 212, 212, 0.4);
 }
 
 /* ===========================
@@ -136,23 +136,23 @@ table {
 th, td {
   text-align: left;
   padding: 10px;
-  border-bottom: 1px solid #2e2650;
+  border-bottom: 1px solid #333;
 }
 
 th {
-  background: #1a1730;
-  color: #d94fff;
+  background: #1f1f1f;
+  color: #bfbfbf;
   text-transform: uppercase;
   font-size: 0.9em;
   letter-spacing: 0.5px;
 }
 
 td {
-  color: #e0d7f8;
+  color: #d4d4d4;
 }
 
 tr:hover {
-  background: #201b36;
+  background: #262626;
 }
 
 /* ===========================
@@ -172,55 +172,23 @@ tr:hover {
 }
 
 .actions .edit {
-  background: #ff8c00; /* orange edit */
-  color: #0a0a12;
+  background: #888888; /* medium gray */
+  color: #0b0b0b;
 }
 
 .actions .edit:hover {
-  background: #ffb84d;
-  box-shadow: 0 0 6px rgba(255, 140, 0, 0.6);
+  background: #aaaaaa;
+  box-shadow: 0 0 6px rgba(170, 170, 170, 0.5);
 }
 
 .actions .delete {
-  background: #e74c3c;
+  background: #c0392b; /* dark red for delete */
   color: #fff;
 }
 
 .actions .delete:hover {
-  background: #ff5c4d;
-  box-shadow: 0 0 6px rgba(231, 76, 60, 0.6);
-}
-
-/* ===========================
-   JOIN / LEAVE DROPDOWNS
-=========================== */
-.actions select.join-game,
-.actions select.leave-game {
-  background: #1a1730;
-  border: 1px solid #2e2650;
-  color: #d94fff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.actions select.join-game:hover,
-.actions select.leave-game:hover {
-  background: #d94fff;
-  color: #0a0a12;
-  box-shadow: 0 0 6px rgba(217, 79, 255, 0.6);
-}
-
-.actions select:focus {
-  outline: none;
-  border-color: #d94fff;
-  box-shadow: 0 0 8px rgba(217, 79, 255, 0.8);
-}
-
-.actions select option {
-  color: #0a0a12;
+  background: #e74c3c;
+  box-shadow: 0 0 6px rgba(231, 76, 60, 0.5);
 }
 
 /* ===========================
@@ -237,22 +205,4 @@ tr:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===========================
-   RESPONSIVE
-=========================== */
-@media (max-width: 600px) {
-  .toggle-buttons {
-    flex-direction: column;
-  }
-
-  form {
-    flex-direction: column;
-  }
-
-  .actions {
-    flex-direction: column;
-    gap: 3px;
-  }
 }
