@@ -179,9 +179,10 @@ app.post("/api/seed", async (req, res) => {
 });
 
 // === SPA FALLBACK ===
-app.get("*", (req, res) => {
+app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
+
 
 // === START SERVER ===
 const port = process.env.PORT || 5000;
