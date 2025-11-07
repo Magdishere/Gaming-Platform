@@ -33,7 +33,7 @@ showGamesBtn.addEventListener("click", () => {
 const API_URL = "https://gaming-platform-api-gq4p.onrender.com/api";
 let allGames = [];
 
-// ---------- FETCH ALL GAMES ----------
+// ---------- FETCH DATA ----------
 async function fetchGames() {
   const res = await fetch(`${API_URL}/games`);
   allGames = await res.json();
@@ -41,9 +41,9 @@ async function fetchGames() {
   allGames.forEach(game => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${game.title}</td>
-      <td>${game.code}</td>
-      <td class="actions">
+      <td data-label="Title">${game.title}</td>
+      <td data-label="Code">${game.code}</td>
+      <td class="actions" data-label="Actions">
         <button class="delete" data-id="${game._id}">Delete</button>
       </td>
     `;
@@ -51,7 +51,6 @@ async function fetchGames() {
   });
 }
 
-// ---------- FETCH ALL PLAYERS ----------
 async function fetchPlayers() {
   const res = await fetch(`${API_URL}/players`);
   const players = await res.json();
@@ -60,10 +59,10 @@ async function fetchPlayers() {
     const joinedGames = player.joinedGames.map(g => g.title).join(", ") || "-";
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${player.name}</td>
-      <td>${player.email || ""}</td>
-      <td>${joinedGames}</td>
-      <td class="actions">
+      <td data-label="Name">${player.name}</td>
+      <td data-label="Email">${player.email || ""}</td>
+      <td data-label="Joined Games">${joinedGames}</td>
+      <td class="actions" data-label="Actions">
         <button class="join" data-player-id="${player._id}">Join</button>
         <button class="leave" data-player-id="${player._id}">Leave</button>
         <button class="delete" data-id="${player._id}">Delete</button>
@@ -73,7 +72,7 @@ async function fetchPlayers() {
   });
 }
 
-// ---------- ADD PLAYER ----------
+// ---------- SUBMIT HANDLERS ----------
 playerForm.addEventListener("submit", async e => {
   e.preventDefault();
   const name = playerName.value.trim();
@@ -89,7 +88,6 @@ playerForm.addEventListener("submit", async e => {
   else { const err = await res.json(); alert(err.error || "Failed to add player"); }
 });
 
-// ---------- ADD GAME ----------
 gameForm.addEventListener("submit", async e => {
   e.preventDefault();
   const title = gameTitle.value.trim();
@@ -110,7 +108,6 @@ document.addEventListener("click", async e => {
   const playerId = e.target.dataset.playerId;
   const td = e.target.closest("td");
 
-  // --- DELETE PLAYER OR GAME ---
   if (e.target.classList.contains("delete")) {
     const id = e.target.dataset.id;
     const type = e.target.closest("table").id.includes("players") ? "players" : "games";
@@ -120,7 +117,6 @@ document.addEventListener("click", async e => {
     else { const err = await res.json(); alert(err.error || "Failed to delete"); }
   }
 
-  // --- JOIN GAME ---
   if (e.target.classList.contains("join")) {
     const code = prompt("Enter game code to join:");
     if (!code) return;
@@ -136,7 +132,6 @@ document.addEventListener("click", async e => {
     else { const err = await res.json(); alert(err.error || "Failed to join game"); }
   }
 
-  // --- LEAVE GAME ---
   if (e.target.classList.contains("leave")) {
     const code = prompt("Enter game code to leave:");
     if (!code) return;

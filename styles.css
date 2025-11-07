@@ -6,7 +6,6 @@ button { cursor: pointer; transition: all 0.3s; }
 
 /* =========================== CONTAINER =========================== */
 .container { max-width: 900px; margin: 40px auto; background: #141414; border-radius: 12px; padding: 30px; border: 1px solid #2a2a2a; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
-
 h1 { text-align: center; color: #bfbfbf; margin-bottom: 20px; text-shadow: 0 0 10px rgba(191,191,191,0.3); letter-spacing: 1px; }
 h2 { color: #bfbfbf; margin-bottom: 15px; text-shadow: 0 0 6px rgba(191,191,191,0.2); font-size: 1.2em; }
 
@@ -41,24 +40,20 @@ tr:hover { background: #262626; }
 .actions .leave { background: #f39c12; color: #0b0b0b; }
 .actions .leave:hover { background: #f1c40f; box-shadow: 0 0 6px rgba(241,196,15,0.5); }
 
+/* =========================== HIDDEN =========================== */
+.hidden { display: none !important; }
+
 /* =========================== RESPONSIVE (MOBILE) =========================== */
 @media (max-width: 600px) {
   .toggle-buttons { flex-direction: column; }
   form { flex-direction: column; }
 
-  table thead { display: none; } /* hide table headers */
+  table thead { display: none; }
   table, tbody, tr, td { display: block; width: 100%; }
   tr { margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+  td { text-align: left; padding: 5px 0; }
+  td::before { content: attr(data-label); font-weight: 600; display: block; color: #bfbfbf; margin-bottom: 4px; }
 
-  td { text-align: left; padding: 5px 0; border: none; }
-  td::before { 
-    content: attr(data-label); 
-    font-weight: 600; 
-    display: block; 
-    color: #bfbfbf; 
-    margin-bottom: 4px; 
-  }
-
-  .actions { flex-direction: row; justify-content: flex-start; }
-  .actions button { width: auto; flex: 1; min-width: 0; }
+  .actions { flex-direction: column; align-items: flex-start; }
+  .actions button { width: 100%; flex: unset; }
 }
