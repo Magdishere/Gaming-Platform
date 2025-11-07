@@ -1,0 +1,224 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { connectDB, getDB } from "./db.js";
+import { ObjectId } from "mongodb";
+import path from "path";
+import { fileURLToPath } from "url";
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// === Static setup for SPA ===
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "../public")));
+
+// === Connect Database ===
+await connectDB();
+const db = getDB();
+const gamesCol = db.collection("games");
+const playersCol = db.collection("players");
+
+// === Health Check ===
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+// === GAMES CRUD ===
+
+// Get all games
+app.get("/api/games", async (req, res) => {
+  const list = await gamesCol.find({}).sort({ title: 1 }).toArray();
+  res.json(list);
+});
+
+// Get game by ID
+app.get("/api/games/:id", async (req, res) => {
+  const doc = await gamesCol.findOne({ _id: new ObjectId(req.params.id) });
+  if (!doc) return res.status(404).json({ error: "Not found" });
+  res.json(doc);
+});
+
+// Create new game
+app.post("/api/games", async (req, res) => {
+  const { title, code } = req.body;
+  if (!title || !code)
+    return res.status(400).json({ error: "title and code are required" });
+
+  const exists = await gamesCol.findOne({ code });
+  if (exists) return res.status(409).json({ error: "Game code already exists" });
+
+  const result = await gamesCol.insertOne({ title, code });
+  const saved = await gamesCol.findOne({ _id: result.insertedId });
+  res.status(201).json(saved);
+});
+
+// Update game
+app.put("/api/games/:id", async (req, res) => {
+  const { title, code } = req.body;
+  if (!title || !code)
+    return res.status(400).json({ error: "title and code are required" });
+
+  const result = await gamesCol.findOneAndUpdate(
+    { _id: new ObjectId(req.params.id) },
+    { $set: { title, code } },
+    { returnDocument: "after" }
+  );
+
+  if (!result.value) return res.status(404).json({ error: "Not found" });
+  res.json(result.value);
+});
+
+// Delete game
+app.delete("/api/games/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await gamesCol.deleteOne({ _id: new ObjectId(id) });
+  if (result.deletedCount === 0)
+    return res.status(404).json({ error: "Not found" });
+
+  // Remove from all players' joinedGames
+  await playersCol.updateMany({}, { $pull: { joinedGames: { gameId: id } } });
+  res.json({ ok: true });
+});
+
+// === PLAYERS CRUD ===
+
+// Get all players (with optional name filter)
+app.get("/api/players", async (req, res) => {
+  const { name } = req.query;
+  const filter = name ? { name: { $regex: name, $options: "i" } } : {};
+  const list = await playersCol.find(filter).sort({ name: 1 }).toArray();
+  res.json(list);
+});
+
+// Get player by ID
+app.get("/api/players/:id", async (req, res) => {
+  const doc = await playersCol.findOne({ _id: new ObjectId(req.params.id) });
+  if (!doc) return res.status(404).json({ error: "Not found" });
+  res.json(doc);
+});
+
+// Create player
+app.post("/api/players", async (req, res) => {
+  const { name, email } = req.body;
+  if (!name) return res.status(400).json({ error: "name is required" });
+
+  const result = await playersCol.insertOne({
+    name,
+    email: email || null,
+    joinedGames: [],
+  });
+  const saved = await playersCol.findOne({ _id: result.insertedId });
+  res.status(201).json(saved);
+});
+
+// Update player
+app.put("/api/players/:id", async (req, res) => {
+  const { name, email } = req.body;
+  if (!name) return res.status(400).json({ error: "name is required" });
+
+  const result = await playersCol.findOneAndUpdate(
+    { _id: new ObjectId(req.params.id) },
+    { $set: { name, email: email || null } },
+    { returnDocument: "after" }
+  );
+
+  if (!result.value) return res.status(404).json({ error: "Not found" });
+  res.json(result.value);
+});
+
+// Delete player
+app.delete("/api/players/:id", async (req, res) => {
+  const result = await playersCol.deleteOne({ _id: new ObjectId(req.params.id) });
+  if (result.deletedCount === 0)
+    return res.status(404).json({ error: "Not found" });
+  res.json({ ok: true });
+});
+
+// === JOIN GAME ===
+app.post("/api/players/:id/join", async (req, res) => {
+  const playerId = req.params.id;
+  const { gameCode } = req.body;
+  if (!gameCode) return res.status(400).json({ error: "gameCode is required" });
+
+  const player = await playersCol.findOne({ _id: new ObjectId(playerId) });
+  const game = await gamesCol.findOne({ code: gameCode });
+  if (!player) return res.status(404).json({ error: "Player not found" });
+  if (!game) return res.status(404).json({ error: "Game not found" });
+
+  const already = await playersCol.findOne({
+    _id: new ObjectId(playerId),
+    "joinedGames.gameId": game._id.toString(),
+  });
+  if (already) return res.status(409).json({ error: "Already joined" });
+
+  const embedded = {
+    gameId: game._id.toString(),
+    title: game.title,
+    code: game.code,
+    joinedAt: new Date().toISOString(),
+  };
+
+  const result = await playersCol.findOneAndUpdate(
+    { _id: new ObjectId(playerId) },
+    { $push: { joinedGames: embedded } },
+    { returnDocument: "after" }
+  );
+
+  res.json(result.value);
+});
+
+// === LEAVE GAME ===
+app.post("/api/players/:id/leave", async (req, res) => {
+  console.log("LEAVE BODY:", req.body);
+  const playerId = req.params.id;
+  const { gameCode } = req.body.gameCode || req.body.code;
+  if (!gameCode) return res.status(400).json({ error: "gameCode is required" });
+
+  const result = await playersCol.findOneAndUpdate(
+    { _id: new ObjectId(playerId) },
+    { $pull: { joinedGames: { code: gameCode } } },
+    { returnDocument: "after" }
+  );
+
+  if (!result.value) return res.status(404).json({ error: "Player not found" });
+  res.json(result.value);
+});
+
+// === DEMO SEED ===
+app.post("/api/seed", async (req, res) => {
+  const games = [
+    { title: "Battle Quest", code: "BQ101" },
+    { title: "Space Raiders", code: "SR202" },
+    { title: "Mystic Legends", code: "ML303" },
+    { title: "Zombie Survival", code: "ZS404" },
+    { title: "Racing Thunder", code: "RT505" },
+  ];
+
+  const players = [
+    { name: "Alex Rivera", email: "alex@example.com", joinedGames: [] },
+    { name: "Jamie Chen", email: "jamie@example.com", joinedGames: [] },
+    { name: "Morgan Lee", email: "morgan@example.com", joinedGames: [] },
+  ];
+
+  await gamesCol.deleteMany({});
+  await playersCol.deleteMany({});
+  await gamesCol.insertMany(games);
+  await playersCol.insertMany(players);
+  res.json({ ok: true });
+});
+
+// === SPA FALLBACK ===
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
+
+// === Start Server ===
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`🎮 Gaming API running at http://localhost:${port}`);
+});

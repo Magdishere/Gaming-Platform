@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Gaming Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 Gaming Platform</h1>
+
+    <!-- Toggle Buttons -->
+    <div class="toggle-buttons">
+      <button id="showPlayersBtn" class="active">Show Players</button>
+      <button id="showGamesBtn">Show Games</button>
+    </div>
+
+    <!-- PLAYERS SECTION -->
+    <section id="playersSection" class="data-section">
+      <h2>Add New Player</h2>
+      <form id="playerForm">
+        <input type="text" id="playerName" placeholder="Player Name" required>
+        <input type="email" id="playerEmail" placeholder="Email" required>
+        <button type="submit">Add Player</button>
+      </form>
+
+      <h2>All Players</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Joined Games</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="playersTableBody"></tbody>
+      </table>
+    </section>
+
+    <!-- GAMES SECTION -->
+    <section id="gamesSection" class="data-section hidden">
+      <h2>Add New Game</h2>
+      <form id="gameForm">
+        <input type="text" id="gameTitle" placeholder="Game Title" required>
+        <input type="text" id="gameCode" placeholder="Game Code (e.g. BQ101)" required>
+        <button type="submit">Add Game</button>
+      </form>
+
+      <h2>All Games</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Code</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="gamesTableBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
