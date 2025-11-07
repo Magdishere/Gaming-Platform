@@ -154,7 +154,7 @@ app.post("/api/players/:id/leave", async (req, res) => {
 });
 
 // === DEMO SEED ===
-app.post("/api/seed", async (req, res) => {
+app.post("/api/seed", async (req, res) => {git 
   const games = [
     { title: "Battle Quest", code: "BQ101" },
     { title: "Space Raiders", code: "SR202" },
