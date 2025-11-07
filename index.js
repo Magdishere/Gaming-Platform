@@ -30,7 +30,7 @@ showGamesBtn.addEventListener("click", () => {
 });
 
 // ---------- API ----------
-const API_URL = "https://gaming-platform-api-gq4p.onrender.com";
+const API_URL = "https://gaming-platform-api-gq4p.onrender.com/api";
 let allGames = [];
 
 // ---------- FETCH ALL GAMES ----------
