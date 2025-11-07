@@ -179,6 +179,7 @@ app.post("/api/seed", async (req, res) => {
 });
 
 // === SPA FALLBACK ===
+app.use(express.static(path.join(__dirname, "../"))); // project root
 app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
