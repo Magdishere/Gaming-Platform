@@ -1,51 +1,39 @@
-/* ===========================
-   BASE & GLOBAL
-=========================== */
+/* =========================== BASE =========================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background: #0b0b0b; color: #d4d4d4; line-height: 1.5; }
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; transition: all 0.3s; }
 
-/* ===========================
-   CONTAINER & HEADINGS
-=========================== */
+/* =========================== CONTAINER =========================== */
 .container { max-width: 900px; margin: 40px auto; background: #141414; border-radius: 12px; padding: 30px; border: 1px solid #2a2a2a; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+
 h1 { text-align: center; color: #bfbfbf; margin-bottom: 20px; text-shadow: 0 0 10px rgba(191,191,191,0.3); letter-spacing: 1px; }
 h2 { color: #bfbfbf; margin-bottom: 15px; text-shadow: 0 0 6px rgba(191,191,191,0.2); font-size: 1.2em; }
 
-/* ===========================
-   TOGGLE BUTTONS
-=========================== */
+/* =========================== TOGGLE BUTTONS =========================== */
 .toggle-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
 .toggle-buttons button { background: #1f1f1f; border: 1px solid #333; color: #d4d4d4; padding: 10px 22px; border-radius: 6px; font-weight: 600; }
-.toggle-buttons button:hover { background: #333; }
 .toggle-buttons button.active { background: #d4d4d4; color: #0b0b0b; box-shadow: 0 0 10px rgba(212,212,212,0.5); }
 
-/* ===========================
-   FORMS
-=========================== */
+/* =========================== FORMS =========================== */
 form { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
 input { padding: 10px; border: 1px solid #333; border-radius: 6px; flex: 1; min-width: 150px; background: #1a1a1a; color: #d4d4d4; }
 input:focus { outline: none; border-color: #bfbfbf; box-shadow: 0 0 6px rgba(191,191,191,0.4); }
 button { background: #bfbfbf; color: #0b0b0b; border: none; border-radius: 6px; padding: 10px 20px; font-weight: 600; }
 button:hover { background: #d4d4d4; box-shadow: 0 0 8px rgba(212,212,212,0.4); }
 
-/* ===========================
-   TABLES
-=========================== */
+/* =========================== TABLE =========================== */
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 th, td { text-align: left; padding: 10px; border-bottom: 1px solid #333; }
 th { background: #1f1f1f; color: #bfbfbf; text-transform: uppercase; font-size: 0.9em; letter-spacing: 0.5px; }
 td { color: #d4d4d4; }
 tr:hover { background: #262626; }
 
-/* ===========================
-   ACTION BUTTONS
-=========================== */
-.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
-.actions button { padding: 6px 10px; font-size: 0.9em; border-radius: 4px; font-weight: 600; min-width: 60px; flex: 1 1 auto; }
-.actions .edit { background: #888888; color: #0b0b0b; }
-.actions .edit:hover { background: #aaaaaa; box-shadow: 0 0 6px rgba(170,170,170,0.5); }
+/* =========================== ACTION BUTTONS =========================== */
+.actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.actions button { padding: 6px 10px; font-size: 0.9em; border-radius: 4px; font-weight: 600; flex: 1 1 auto; min-width: 60px; }
+.actions .edit { background: #888; color: #0b0b0b; }
+.actions .edit:hover { background: #aaa; box-shadow: 0 0 6px rgba(170,170,170,0.5); }
 .actions .delete { background: #c0392b; color: #fff; }
 .actions .delete:hover { background: #e74c3c; box-shadow: 0 0 6px rgba(231,76,60,0.5); }
 .actions .join { background: #2980b9; color: #fff; }
@@ -53,36 +41,24 @@ tr:hover { background: #262626; }
 .actions .leave { background: #f39c12; color: #0b0b0b; }
 .actions .leave:hover { background: #f1c40f; box-shadow: 0 0 6px rgba(241,196,15,0.5); }
 
-/* ===========================
-   VISIBILITY & ANIMATION
-=========================== */
-.hidden { display: none; }
-.data-section { animation: fadeIn 0.3s ease-in-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ===========================
-   RESPONSIVE TABLES (card-style)
-=========================== */
+/* =========================== RESPONSIVE (MOBILE) =========================== */
 @media (max-width: 600px) {
-  td {
-    display: block;       /* stack vertically */
-    padding: 8px 0;
-    border: none;
-    border-bottom: 1px solid #333;
+  .toggle-buttons { flex-direction: column; }
+  form { flex-direction: column; }
+
+  table thead { display: none; } /* hide table headers */
+  table, tbody, tr, td { display: block; width: 100%; }
+  tr { margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+
+  td { text-align: left; padding: 5px 0; border: none; }
+  td::before { 
+    content: attr(data-label); 
+    font-weight: 600; 
+    display: block; 
+    color: #bfbfbf; 
+    margin-bottom: 4px; 
   }
 
-  td::before {
-    display: block;       /* label on top */
-    content: attr(data-label);
-    font-weight: 600;
-    color: #bfbfbf;
-    margin-bottom: 4px;   /* space between label and value */
-  }
-
-  .actions {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-  }
+  .actions { flex-direction: row; justify-content: flex-start; }
+  .actions button { width: auto; flex: 1; min-width: 0; }
 }
-
