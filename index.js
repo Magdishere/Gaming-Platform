@@ -186,10 +186,10 @@ document.addEventListener("click", async e => {
     if (!availableGames.length) return alert("No available games to join");
 
     const choice = prompt(
-      "Enter the game code to join:\n" + availableGames.map(g => `${g.title} (${g.code})`).join("\n")
+      "Enter the game code to join:\n\n" + availableGames.map(g => `${g.title} (${g.code})`).join("\n")
     );
     const game = availableGames.find(g => g.code === choice?.trim());
-    if (!game) return alert("Invalid selection");
+    // if (!game) return alert("Invalid selection");
 
     await fetch(`${API_URL}/players/${id}/join`, {
       method: "POST",
@@ -209,7 +209,7 @@ document.addEventListener("click", async e => {
       "Enter the game code to leave:\n" + player.joinedGames.map(g => `${g.title} (${g.code})`).join("\n")
     );
     const game = player.joinedGames.find(g => g.code === choice?.trim());
-    if (!game) return alert("Invalid selection");
+    // if (!game) return alert("Invalid selection");
 
     await fetch(`${API_URL}/players/${id}/leave`, {
       method: "POST",
