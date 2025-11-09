@@ -1,28 +1,30 @@
-const API_URL = "https://gaming-platform-api-gq4p.onrender.com/api";
-
-// DOM elements
+// === DOM ELEMENTS ===
 const showPlayersBtn = document.getElementById("showPlayersBtn");
 const showGamesBtn = document.getElementById("showGamesBtn");
 const playersSection = document.getElementById("playersSection");
 const gamesSection = document.getElementById("gamesSection");
 
 const playerForm = document.getElementById("playerForm");
+const playerFormTitle = document.getElementById("playerFormTitle");
+const playerFormBtn = document.getElementById("playerFormBtn");
+const playerIdInput = document.getElementById("playerId");
 const playerName = document.getElementById("playerName");
 const playerEmail = document.getElementById("playerEmail");
 const playersTableBody = document.getElementById("playersTableBody");
-const playerFormTitle = document.getElementById("playerFormTitle");
 
 const gameForm = document.getElementById("gameForm");
+const gameFormTitle = document.getElementById("gameFormTitle");
+const gameFormBtn = document.getElementById("gameFormBtn");
+const gameIdInput = document.getElementById("gameId");
 const gameTitle = document.getElementById("gameTitle");
 const gameCode = document.getElementById("gameCode");
 const gamesTableBody = document.getElementById("gamesTableBody");
-const gameFormTitle = document.getElementById("gameFormTitle");
 
+// === API URL ===
+const API_URL = "https://gaming-platform-api-gq4p.onrender.com/api";
 let allGames = [];
-let editingPlayer = null;
-let editingGame = null;
 
-// Toggle sections
+// === TOGGLE SECTIONS ===
 showPlayersBtn.addEventListener("click", () => {
   showPlayersBtn.classList.add("active");
   showGamesBtn.classList.remove("active");
@@ -37,169 +39,174 @@ showGamesBtn.addEventListener("click", () => {
   playersSection.classList.add("hidden");
 });
 
-// Fetch data
+// === FETCH DATA ===
 async function fetchGames() {
   const res = await fetch(`${API_URL}/games`);
   allGames = await res.json();
-  gamesTableBody.innerHTML = allGames.map(g => `
-    <tr>
-      <td data-label="Title">${g.title}</td>
-      <td data-label="Code">${g.code}</td>
+  gamesTableBody.innerHTML = "";
+  allGames.forEach((game) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="Title">${game.title}</td>
+      <td data-label="Code">${game.code}</td>
       <td class="actions" data-label="Actions">
-        <button class="edit" data-id="${g._id}" data-type="game">Edit</button>
-        <button class="delete" data-id="${g._id}" data-type="game">Delete</button>
+        <button class="edit" data-type="game" data-id="${game._id}">Edit</button>
+        <button class="delete" data-type="game" data-id="${game._id}">Delete</button>
       </td>
-    </tr>
-  `).join("");
+    `;
+    gamesTableBody.appendChild(tr);
+  });
 }
 
 async function fetchPlayers() {
   const res = await fetch(`${API_URL}/players`);
   const players = await res.json();
-  playersTableBody.innerHTML = players.map(p => `
-    <tr>
-      <td data-label="Name">${p.name}</td>
-      <td data-label="Email">${p.email || ""}</td>
-      <td data-label="Joined Games">${p.joinedGames.map(g => g.title).join(", ") || "-"}</td>
+  playersTableBody.innerHTML = "";
+  players.forEach((player) => {
+    const joinedGames = player.joinedGames.map((g) => `${g.title} (${g.code})`).join(", ") || "-";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="Name">${player.name}</td>
+      <td data-label="Email">${player.email || ""}</td>
+      <td data-label="Joined Games">${joinedGames}</td>
       <td class="actions" data-label="Actions">
-        <button class="join" data-id="${p._id}">Join</button>
-        <button class="leave" data-id="${p._id}">Leave</button>
-        <button class="edit" data-id="${p._id}" data-type="player">Edit</button>
-        <button class="delete" data-id="${p._id}" data-type="player">Delete</button>
+        <button class="edit" data-type="player" data-id="${player._id}">Edit</button>
+        <button class="join" data-player-id="${player._id}">Join</button>
+        <button class="leave" data-player-id="${player._id}">Leave</button>
+        <button class="delete" data-type="player" data-id="${player._id}">Delete</button>
       </td>
-    </tr>
-  `).join("");
+    `;
+    playersTableBody.appendChild(tr);
+  });
 }
 
-// Add / Edit Player
-playerForm.addEventListener("submit", async e => {
+// === SUBMIT HANDLERS ===
+playerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const id = playerIdInput.value;
   const data = { name: playerName.value.trim(), email: playerEmail.value.trim() };
-  if (!data.name) return alert("Name is required");
 
-  let res;
-  if (editingPlayer) {
-    res = await fetch(`${API_URL}/players/${editingPlayer}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-  } else {
-    res = await fetch(`${API_URL}/players`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-  }
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_URL}/players/${id}` : `${API_URL}/players`;
+
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
   if (res.ok) {
-    editingPlayer = null;
     playerForm.reset();
-    playerFormTitle.textContent = "Add New Player";
+    playerIdInput.value = "";
+    playerFormTitle.textContent = "Add Player";
+    playerFormBtn.textContent = "Add Player";
     fetchPlayers();
-  } else {
-    alert("Failed to save player");
-  }
+  } else alert("Error saving player");
 });
 
-// Add / Edit Game
-gameForm.addEventListener("submit", async e => {
+gameForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const id = gameIdInput.value;
   const data = { title: gameTitle.value.trim(), code: gameCode.value.trim() };
-  if (!data.title || !data.code) return alert("Title and code are required");
 
-  let res;
-  if (editingGame) {
-    res = await fetch(`${API_URL}/games/${editingGame}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-  } else {
-    res = await fetch(`${API_URL}/games`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-  }
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_URL}/games/${id}` : `${API_URL}/games`;
+
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
   if (res.ok) {
-    editingGame = null;
     gameForm.reset();
-    gameFormTitle.textContent = "Add New Game";
+    gameIdInput.value = "";
+    gameFormTitle.textContent = "Add Game";
+    gameFormBtn.textContent = "Add Game";
     fetchGames();
-  } else {
-    alert("Failed to save game");
-  }
+    fetchPlayers();
+  } else alert("Error saving game");
 });
 
-// Click actions
-document.addEventListener("click", async e => {
+// === CLICK ACTIONS ===
+document.addEventListener("click", async (e) => {
   const id = e.target.dataset.id;
 
+  // Delete
   if (e.target.classList.contains("delete")) {
     const type = e.target.dataset.type;
     if (!confirm(`Delete this ${type}?`)) return;
-    await fetch(`${API_URL}/${type}s/${id}`, { method: "DELETE" });
-    type === "game" ? fetchGames() : fetchPlayers();
+    const res = await fetch(`${API_URL}/${type}s/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      type === "player" ? fetchPlayers() : fetchGames().then(fetchPlayers);
+    } else alert("Delete failed");
   }
 
+  // Edit
   if (e.target.classList.contains("edit")) {
     const type = e.target.dataset.type;
+    const res = await fetch(`${API_URL}/${type}s/${id}`);
+    const data = await res.json();
+
     if (type === "player") {
-      const res = await fetch(`${API_URL}/players/${id}`);
-      const player = await res.json();
-      playerName.value = player.name;
-      playerEmail.value = player.email || "";
-      editingPlayer = id;
+      playerIdInput.value = data._id;
+      playerName.value = data.name;
+      playerEmail.value = data.email || "";
       playerFormTitle.textContent = "Edit Player";
+      playerFormBtn.textContent = "Save Player";
       showPlayersBtn.click();
     } else {
-      const res = await fetch(`${API_URL}/games/${id}`);
-      const game = await res.json();
-      gameTitle.value = game.title;
-      gameCode.value = game.code;
-      editingGame = id;
+      gameIdInput.value = data._id;
+      gameTitle.value = data.title;
+      gameCode.value = data.code;
       gameFormTitle.textContent = "Edit Game";
+      gameFormBtn.textContent = "Save Game";
       showGamesBtn.click();
     }
   }
 
+  // Join Game (dropdown select)
   if (e.target.classList.contains("join")) {
-    const code = prompt("Enter game code to join:");
-    if (!code) return;
-    const resGames = await fetch(`${API_URL}/games`);
-    const games = await resGames.json();
-    const game = games.find(g => g.code === code.trim());
-    if (!game) return alert("Invalid game code");
+    const playerId = e.target.dataset.playerId;
+    if (allGames.length === 0) return alert("No games available.");
+    const gameList = allGames.map((g, i) => `${i + 1}. ${g.title} (${g.code})`).join("\n");
+    const choice = prompt(`Select a game number to join:\n\n${gameList}`);
+    const game = allGames[Number(choice) - 1];
+    if (!game) return alert("Invalid selection.");
 
-    await fetch(`${API_URL}/players/${id}/join`, {
+    const res = await fetch(`${API_URL}/players/${playerId}/join`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ gameId: game._id })
+      body: JSON.stringify({ gameId: game._id }),
     });
-    fetchPlayers();
+    if (res.ok) fetchPlayers();
+    else alert("Failed to join game");
   }
 
+  // Leave Game (dropdown of joined games)
   if (e.target.classList.contains("leave")) {
-    const code = prompt("Enter game code to leave:");
-    if (!code) return;
-    const playerRes = await fetch(`${API_URL}/players/${id}`);
+    const playerId = e.target.dataset.playerId;
+    const playerRes = await fetch(`${API_URL}/players/${playerId}`);
     const player = await playerRes.json();
-    const joined = player.joinedGames.find(g => g.code === code.trim());
-    if (!joined) return alert("You are not in that game");
+    if (player.joinedGames.length === 0) return alert("No joined games to leave.");
 
-    await fetch(`${API_URL}/players/${id}/leave`, {
+    const joinedList = player.joinedGames.map((g, i) => `${i + 1}. ${g.title} (${g.code})`).join("\n");
+    const choice = prompt(`Select a game number to leave:\n\n${joinedList}`);
+    const selected = player.joinedGames[Number(choice) - 1];
+    if (!selected) return alert("Invalid selection.");
+
+    const res = await fetch(`${API_URL}/players/${playerId}/leave`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ gameId: joined.gameId })
+      body: JSON.stringify({ gameId: selected.gameId }),
     });
-    fetchPlayers();
+    if (res.ok) fetchPlayers();
+    else alert("Failed to leave game");
   }
 });
 
-// Initial load
+// === INITIAL LOAD ===
 (async () => {
   await fetchGames();
-  fetchPlayers();
+  await fetchPlayers();
 })();
